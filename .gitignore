@@ -26,3 +26,6 @@ target/
 .cargo-tools/
 
 rust-migration-notes.md
+# Local-only
+CLAUDE.local.md
+.DS_Store
