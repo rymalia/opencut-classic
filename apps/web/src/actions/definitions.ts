@@ -1,5 +1,5 @@
 import type { ShortcutKey } from "@/actions/keybinding";
-import type { TActionWithOptionalArgs } from "./types";
+import type { TActionWithNoArgs, TActionWithOptionalArgs } from "./types";
 
 export type TActionCategory =
 	| "playback"
@@ -182,6 +182,35 @@ const ACTION_DEFAULT_SHORTCUTS_BY_ACTION = new Map<
 	TAction,
 	readonly ShortcutKey[]
 >(ACTION_DEFAULT_SHORTCUTS);
+
+// Arg-taking actions whose args may be omitted (so they can be keybound).
+// Typed as a full Record so it stays in sync with TActionArgsMap.
+const ACTIONS_WITH_OMITTABLE_ARGS: Record<
+	Exclude<TActionWithOptionalArgs, TActionWithNoArgs>,
+	true
+> = {
+	"seek-forward": true,
+	"seek-backward": true,
+	"jump-forward": true,
+	"jump-backward": true,
+};
+
+function isAction(value: unknown): value is TAction {
+	return typeof value === "string" && Object.hasOwn(ACTIONS, value);
+}
+
+export function isActionWithOptionalArgs(
+	value: unknown,
+): value is TActionWithOptionalArgs {
+	if (!isAction(value)) {
+		return false;
+	}
+	const definition: TActionBaseDefinition = ACTIONS[value];
+	return (
+		definition.args === undefined ||
+		Object.hasOwn(ACTIONS_WITH_OMITTABLE_ARGS, value)
+	);
+}
 
 export function getActionDefinition({
 	action,
