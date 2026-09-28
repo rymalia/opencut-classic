@@ -346,7 +346,9 @@ describe("mask snapping", () => {
 		// bounds.width=200 → localCanvasSize.width/2=100 is the right snap target.
 		// width=0.4, scale=1 → aabbHalfW = (0.4*200)/2 * 1 = 40.
 		// At scale=2.48 → rightEdge=0+40*2.48=99.2; |99.2-100|=0.8 < threshold(8)
-		// → snaps to scale=1*(100/40)=2.5; line at position 100.
+		// → snaps to scale=1*(100/40)=2.5. The box is centered, so the left
+		// edge lands on -100 at the same scale; uniform scale has no preferred
+		// edge, so both guides show.
 		const result = snapBoxMaskInteraction({
 			handleId: { kind: "scale" },
 			startParams: buildRectangleParams({ scale: 1 }),
@@ -357,7 +359,10 @@ describe("mask snapping", () => {
 		});
 
 		expect(result.params.scale).toBe(2.5);
-		expect(result.activeLines).toEqual([{ type: "vertical", position: 100 }]);
+		expect(result.activeLines).toEqual([
+			{ type: "vertical", position: -100 },
+			{ type: "vertical", position: 100 },
+		]);
 	});
 
 	test("snaps text mask movement using intrinsic text bounds", () => {
@@ -495,13 +500,15 @@ describe("custom mask point insertion", () => {
 		});
 
 		expect(nextPoints.map((point) => point.id)).toEqual(["a", "new", "b", "c"]);
+		// De Casteljau split of the straight a→b segment: the new point gets
+		// handles collinear with the segment, so the path stays straight.
 		expect(nextPoints[1]).toMatchObject({
 			id: "new",
 			x: 0,
 			y: -0.1,
-			inX: 0,
+			inX: -0.1,
 			inY: 0,
-			outX: 0,
+			outX: 0.1,
 			outY: 0,
 		});
 	});

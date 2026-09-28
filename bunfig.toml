@@ -1,2 +1,8 @@
 [install]
 linker = "hoisted"
+
+[test]
+preload = [
+	"./apps/web/src/wasm/test-preload.ts",
+	"./apps/web/src/text/test-preload.ts",
+]

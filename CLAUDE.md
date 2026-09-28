@@ -35,7 +35,7 @@ DB scripts (drizzle) live in `apps/web/package.json` (`db:generate`, `db:migrate
 - `next.config.ts` sets `turbopack.root` to the monorepo root because a stray lockfile in a parent directory can otherwise hijack root inference.
 - `next dev` holds a lock at `apps/web/.next/dev/lock`; a second instance (even on another port) fails. Kill any test server before handing back.
 - Dev mode injects **React Scan** from unpkg (`src/app/layout.tsx`) — the purple re-render outlines. Toggle it via its on-page toolbar.
-- Known test failures (5, as of 2026-09-28): four suites error with `wasm.__wbindgen_start is not a function` because `opencut-wasm` is built for the bundler target and can't load under bun's runtime; one suite imports a no-longer-exported `isShortcutKey` from `src/actions/keybinding.ts`. CI doesn't run tests.
+- `bun test` relies on two preloads registered in `bunfig.toml` `[test]`: `apps/web/src/wasm/test-preload.ts` (a bun plugin that instantiates `opencut-wasm`'s `.wasm` — the package is built for the bundler target, which bun's runtime can't load) and `apps/web/src/text/test-preload.ts` (a fixed-metrics `OffscreenCanvas`, since bun has no canvas). Run tests from the repo root so `bunfig.toml` is picked up. CI doesn't run tests, so drift goes unnoticed — run them yourself.
 
 ## Architecture
 
