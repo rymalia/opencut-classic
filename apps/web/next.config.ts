@@ -1,8 +1,12 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
 import { withContentCollections } from "@content-collections/next";
 
 const nextConfig: NextConfig = {
+	turbopack: {
+		root: path.join(__dirname, "../.."),
+	},
 	compiler: {
 		removeConsole: process.env.NODE_ENV === "production",
 	},
